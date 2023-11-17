@@ -254,13 +254,13 @@ public:
 			planeta.denumireTari = new string[planeta.numarTari];
 			for (int i = 0;i < planeta.numarTari;i++)
 			{
-				cout << "Are stele" << i + 1 << ";";
+				cout << "Cateva tari ar fi " << i + 1 << ":";
 				citire >> planeta.denumireTari[i];
 			}
 		}
 		else
 		{
-			cout << "Nicio tara.";
+			cout << "Nicio tara." << endl;
 			planeta.denumireTari = NULL;
 		}
 		return citire;
@@ -544,7 +544,7 @@ public:
 		citire >> stea.temperatura;
 		cout << "si o raza de: ";
 		citire >> stea.raza;
-		cout << "In compozitia ei se afla elemente in numar de: ";
+		cout << " In compozitia ei se afla elemente in numar de: ";
 		citire >> stea.numarElemente;
 		if (stea.compozitie != NULL)
 		{
@@ -555,13 +555,13 @@ public:
 			stea.compozitie = new string[stea.numarElemente];
 			for (int i = 0;i < stea.numarElemente;i++)
 			{
-				cout << "Are stele" << i + 1 << ";";
+				cout << "Cateva elemente ar fi " << i + 1 << ":";
 				citire >> stea.compozitie[i];
 			}
 		}
 		else
 		{
-			cout << "Niciun element in compozitie.";
+			cout << "Niciun element in compozitie." << endl;
 			stea.compozitie = NULL;
 		}
 		return citire;
@@ -801,13 +801,13 @@ public:
 			galaxie.denumireTipuriStele = new string[galaxie.numarTipuriStele];
 			for (int i = 0;i < galaxie.numarTipuriStele;i++)
 			{
-				cout << "Are stele" << i + 1 << ";";
+				cout << "Cateva tipuri de stele ar fi " << i + 1 << ":";
 				citire >> galaxie.denumireTipuriStele[i];
 			}
 		}
 		else
 		{
-			cout << "Niciun tip de stea.";
+			cout << "Niciun tip de stea." << endl;
 			galaxie.denumireTipuriStele = NULL;
 		}
 		return citire;
@@ -861,7 +861,7 @@ ostream& operator<<(ostream& vizualizare, const Galaxie& galaxie)
 
 void main()
 {
-	Planeta planeta1;
+	/*Planeta planeta1;
 	cout<<planeta1;
 
 	string* denumireTari = new string[4];
@@ -1025,6 +1025,70 @@ void main()
 	else
 	{
 		cout<< "Cele doua galaxii au acelasi numar de tipuri de stele.";
-	}
+	} */
 	
+    int n;
+	cout << "\nNumar planete: ";
+	cin >> n;
+	Planeta* planete = new Planeta[n];
+	for (int i = 0;i < n;i++)
+	{
+		cin >> planete[i];
+	}
+	for (int i = 0;i < n;i++)
+	{
+		cout << planete[i];
+	}
+	delete[]planete;
+
+	cout << "\nNumar stele: ";
+	cin >> n;
+	Stea* stele = new Stea[n];
+	for (int i = 0;i < n;i++)
+	{
+		cin >> stele[i];
+	}
+	for (int i = 0;i < n;i++)
+	{
+		cout << stele[i];
+	}
+	delete[]stele;
+
+	cout << "\nNumar galaxii: ";
+	cin >> n;
+	Galaxie* galaxii = new Galaxie[n];
+	for (int i = 0;i < n;i++)
+	{
+		cin >> galaxii[i];
+	}
+	for (int i = 0;i < n;i++)
+	{
+		cout << galaxii[i];
+	}
+	delete[]galaxii;
+
+	cout << "\nLiniile si coloanele matricei planeta: ";
+	cin >> n;
+	Planeta** matricePlaneta = new Planeta * [n];
+	for (int i = 0;i < n;i++)
+	{
+		matricePlaneta[i] = new Planeta[n];
+		for (int j = 0;j < n;j++)
+		{
+			cin >> matricePlaneta[i][j];
+		}
+	}
+	for (int i = 0;i < n;i++) 
+	{
+		for(int j = 0;j < n;j++)
+		{
+			cout << matricePlaneta[i][j];
+		}
+	}
+	for (int i = 0;i < n;i++)
+	{
+		delete[]matricePlaneta[i];
+	}
+	delete[]matricePlaneta;
+
   }
