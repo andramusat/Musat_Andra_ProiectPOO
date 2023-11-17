@@ -1,4 +1,4 @@
-#include<iostream>
+﻿#include<iostream>
 #include<string>
 using namespace std;
 //DOMENIUL ASTRONOMIE
@@ -163,7 +163,7 @@ public:
 		return this->diametru;
 	}
 
-	void setNumarTari(int numarTari, string* denumire)
+	void setTari(int numarTari, string* denumire)
 	{
 		if (numarTari > 0)
 		{
@@ -180,12 +180,12 @@ public:
 		}
 	}
 
-	string* getDenumireTari()
+	string* getDenumiriTari()
 	{
 		return this->denumireTari;
 	}
 	
-	string getDenumireTari(int index)
+	string getDenumireTara(int index)
 	{
 		if (index >= 0 && index < this->numarTari)
 		{
@@ -225,7 +225,7 @@ public:
 
 	Planeta& operator++()
 	{
-		this->diametru++;
+	    this->diametru++;
 		return *this;
 	}
 
@@ -237,6 +237,34 @@ public:
 	}
 
 	friend ostream& operator<<(ostream& vizualizare, const Planeta& planeta);
+	friend istream& operator>>(istream& citire, Planeta& planeta)
+	{
+		cout << "Planeta: ";
+		citire >> planeta.nume;
+		cout << "are diametrul de: ";
+		cin >> planeta.diametru;
+		cout << "Pe aceasta planeta se regasesc tari in numar de: ";
+		citire >> planeta.numarTari;
+		if (planeta.denumireTari != NULL)
+		{
+			delete[]planeta.denumireTari;
+		}
+		if (planeta.numarTari > 0)
+		{
+			planeta.denumireTari = new string[planeta.numarTari];
+			for (int i = 0;i < planeta.numarTari;i++)
+			{
+				cout << "Are stele" << i + 1 << ";";
+				citire >> planeta.denumireTari[i];
+			}
+		}
+		else
+		{
+			cout << "Nicio tara.";
+			planeta.denumireTari = NULL;
+		}
+		return citire;
+	}
 };
 
 int Planeta::numarPlanete = 9;
@@ -261,7 +289,7 @@ string getSirTari(const Planeta& planeta)
 ostream& operator<<(ostream& vizualizare, const Planeta& planeta)
 {
 	vizualizare << "Planeta " << planeta.getNume() << " are id-ul " << planeta.getId() << ", diametrul de " << planeta.diametru << " si " << planeta.numarTari << " tari." << endl;
-	cout << "Cateva tari ar fi: ";
+	vizualizare << "Cateva tari ar fi: ";
 	if (planeta.numarTari == 0)
 	{
 		vizualizare << "Nicio tara.";
@@ -459,7 +487,7 @@ public:
 		return this->raza;
 	}
 
-	void setNumarElemente(int numarElemente, string* comp)
+	void setElemente(int numarElemente, string* comp)
 	{
 		if (numarElemente > 0)
 		{
@@ -498,6 +526,7 @@ public:
 		{
 			return this->compozitie[pozitie];
 		}
+		else throw 404;
 	}
 
 	Stea* operator->()
@@ -507,7 +536,36 @@ public:
 	}
 
 	friend ostream& operator<<(ostream& vizualizare, const Stea& stea);
-	
+	friend istream& operator>>(istream& citire, Stea& stea)
+	{
+		cout << "Steaua: ";
+		citire >> stea.nume;
+		cout << "are temperatura de: ";
+		citire >> stea.temperatura;
+		cout << "si o raza de: ";
+		citire >> stea.raza;
+		cout << "In compozitia ei se afla elemente in numar de: ";
+		citire >> stea.numarElemente;
+		if (stea.compozitie != NULL)
+		{
+			delete[]stea.compozitie;
+		}
+		if (stea.numarElemente > 0)
+		{
+			stea.compozitie = new string[stea.numarElemente];
+			for (int i = 0;i < stea.numarElemente;i++)
+			{
+				cout << "Are stele" << i + 1 << ";";
+				citire >> stea.compozitie[i];
+			}
+		}
+		else
+		{
+			cout << "Niciun element in compozitie.";
+			stea.compozitie = NULL;
+		}
+		return citire;
+	}
 };
 
 int Stea::numarStele = 0;
@@ -531,7 +589,7 @@ string getSirElemente(const Stea& stea)
 ostream& operator<<(ostream& vizualizare, const Stea& stea)
 {
 	vizualizare << "Steaua " << stea.getNume() << " are id-ul " << stea.getId() << ", temperatura de " << stea.temperatura << " Kelvin si o raza de " << stea.raza << " unitati solare." << "In compozitia stelei se regasesc "<<stea.numarElemente<<" elemente."<<endl;
-	cout << "Cateva elemente ar fi: ";
+	vizualizare << "Cateva elemente ar fi: ";
 	if (stea.numarElemente == 0)
 	{
 		vizualizare << "Nicin element.";
@@ -694,7 +752,7 @@ public:
 		return this->id;
 	}
 
-	void setNumarTipuriStele(int numarTipuriStele, string* denumire)
+	void setTipuriStele(int numarTipuriStele, string* denumire)
 	{
 		if (numarTipuriStele > 0)
 		{
@@ -711,12 +769,12 @@ public:
 		}
 	}
 
-	string* getDenumireTipuriStele()
+	string* getDenumiriTipuriStele()
 	{
 		return this->denumireTipuriStele;
 	}
 
-	string getDenumireTipuriStele(int index)
+	string getDenumireTipStea(int index)
 	{
 		if (index >= 0 && index < this->numarTipuriStele)
 		{
@@ -756,7 +814,7 @@ public:
 	}
 
 	bool operator!=(const Galaxie& altaGalaxie)
-	const{
+	{
 		return this->numarTipuriStele != altaGalaxie.numarTipuriStele;
 
 	}
@@ -783,7 +841,7 @@ string getSirTipuriStele(const Galaxie& galaxie)
 ostream& operator<<(ostream& vizualizare, const Galaxie& galaxie)
 {
 	vizualizare << "Galaxia " << galaxie.getNume() << " are id-ul " << galaxie.getId() << " si contine " << galaxie.numarTipuriStele << " stele." << endl;
-	cout << "Cateva tipuri de stele ar fi: ";
+	vizualizare << "Cateva tipuri de stele ar fi: ";
 	if (galaxie.numarTipuriStele == 0)
 	{
 		vizualizare << "Niciun tip de stele.";
@@ -838,22 +896,24 @@ void main()
 	cout << planeta01.getDiametru() << endl;
 
 	string* tari = new string[3]{ "Calidora", "Heliospica", "Mercuria" }; //acestea sunt denumiri fictive
-	planeta01.setNumarTari(3, tari);
-	cout<<planeta01;
+	planeta01.setTari(3, tari);
+	cout << planeta01 << endl;
 
-	cout << *planeta01.getDenumireTari() << endl;
-	cout << planeta01.getDenumireTari()[1] << endl;
-	cout << planeta01.getDenumireTari(1) << endl;
+	cout << "Un prim exemplu de tara ar fi: " << planeta01.getDenumiriTari()[0] << endl;
+	cout << "Un alt exemplu de tara ar fi: "<< planeta01.getDenumireTara(2) << endl;
 	
 	Planeta planeta02;
 	planeta1 = planeta01 + planeta02;
 	cout<<planeta1;
 
-	cout << "Forma initiala a planetei Mercur: " << planeta01 << endl;
-	++planeta01;
-	cout << "Forma planetei Mercur dupa preincrementare: " << planeta01 << endl;
-	Planeta copie = planeta01++;
-	cout << "Forma planetei Mercur dupa postincrementare: " << planeta01 << endl;
+	
+    cout << "Forma initiala a planetei Mercur: " << planeta01 << endl;
+    Planeta planeta4;
+	planeta4 = ++planeta01;
+	cout << "Forma planetei Mercur dupa preincrementare: " << planeta4 << endl;
+	Planeta planeta5;
+	planeta5 = planeta01++;
+	cout << "Forma planetei Mercur dupa postincrementare: " << planeta5 << endl;
 
     cout << "Sirul tarilor de pe planeta Mercur: " << getSirTari(planeta01)<<endl;
 
@@ -895,16 +955,26 @@ void main()
 	cout << stea01->getRaza() << endl;
 
 	string* elemente = new string[7]{ "Nitrogen", "Oxigen", "Heliu", "Hidrogen","Nichel", "Zinc","Fier"};
-	stea01.setNumarElemente(7, elemente);
-	cout<<stea01;
+	stea01.setElemente(7, elemente);
+	cout << stea01 << endl;
 
-	cout << *stea01.getCompozitie() << endl;
-	cout << stea01.getCompozitie()[1] << endl;
-	cout << stea01.getCompozitie(1) << endl;
+	cout << "Un prim exemplu de element ar fi: " << stea01.getCompozitie()[0] << endl;
+	cout << "Un alt exemplu de element ar fi: " << stea01.getCompozitie(1) << endl;
 
-	cout << endl << stea01[2] << endl;
-
-	cout << "Sirul elementelor din compozitia stelei Arcturus: " << getSirElemente(stea01) << endl;
+	try {
+		cout << "Al treilea element din steaua Arcturus: " << stea01[2] << endl;
+	}
+	catch (int ex1) {
+		cout << "Pozitia este in afara limitelor" << endl;
+	}
+	catch (float ex2) {
+		cout << "Pozitia este in afara limitelor" << endl;
+	}
+	catch (...) {
+		cout << "Exceptie necunoscuta";
+	}
+	
+    cout << "Sirul elementelor din compozitia stelei Arcturus: " << getSirElemente(stea01) << endl;
 
 	Galaxie galaxie1;
 	cout << galaxie1;
@@ -939,15 +1009,13 @@ void main()
 	cout << galaxie01.getId() << endl;
 
 	string* tipuriStele = new string[5]{ "Pitice rosii", "Pitice albe", "Gigante rosii", "Gigante portocalii", "Gigante albastre"};
-	galaxie01.setNumarTipuriStele(5, tipuriStele);
-	cout << galaxie01;
+	galaxie01.setTipuriStele(5, tipuriStele);
+	cout << galaxie01 << endl;
 
-	cout << *galaxie01.getDenumireTipuriStele() << endl;
-	cout << galaxie01.getDenumireTipuriStele()[1] << endl;
-	cout << galaxie01.getDenumireTipuriStele(1) << endl;
+	cout << "Un prim exemplu de tip de stea ar fi: " << galaxie01.getDenumiriTipuriStele()[0] << endl;
+	cout << "Un alt exemplu de tip de stea ar fi:" << galaxie01.getDenumireTipStea(3) << endl;
 
-
-	cout << "Sirul tipurilor de stele din prima galaxie: " << getSirTipuriStele(galaxie01) << endl;
+    cout << "Sirul tipurilor de stele din prima galaxie: " << getSirTipuriStele(galaxie01) << endl;
 	
 	Galaxie galaxie4;
 	if (galaxie3 != galaxie4)
