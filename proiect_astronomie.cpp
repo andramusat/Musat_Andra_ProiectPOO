@@ -326,7 +326,6 @@ public:
 		this->temperatura = 0.0;
 		this->raza = 0.0;
 		this->compozitie = NULL;
-		numarStele++;
 	}
 
 	Stea(int id, string nume, float temperatura, float raza, int numarElemente, string* compozitie): id(id), nume(nume), temperatura(temperatura), raza(raza), numarElemente(numarElemente)
@@ -338,7 +337,6 @@ public:
 			{
 				this->compozitie[i] = compozitie[i];
 			}
-			numarStele++;
 		}
 		else
 		{
@@ -353,7 +351,6 @@ public:
 		this->raza = 473080000;
 		this->numarElemente = 0;
 		this->compozitie = NULL;
-		numarStele++;
 	}
 
 	Stea(const Stea& stea) : id(stea.id)
@@ -463,7 +460,7 @@ public:
 
 	void setTemperatura(float temperatura)
 	{
-		if (temperatura > 0)
+		if (temperatura > 0.0)
 		{
 			this->temperatura = temperatura;
 		}
@@ -476,7 +473,7 @@ public:
 
 	void setRaza(float raza)
 	{
-		if (raza > 0)
+		if (raza > 0.0)
 		{
 			this->raza = raza;
 		}
@@ -566,6 +563,8 @@ public:
 		}
 		return citire;
 	}
+
+	friend class Constelatie;
 };
 
 int Stea::numarStele = 0;
@@ -592,21 +591,205 @@ ostream& operator<<(ostream& vizualizare, const Stea& stea)
 	vizualizare << "Cateva elemente ar fi: ";
 	if (stea.numarElemente == 0)
 	{
-		vizualizare << "Nicin element.";
+		vizualizare << "Niciun element.";
 	}
 	else
 	{
 
-		for (int i = 0;i < stea.numarElemente;i++)
+		for (int i = 0;i < stea.numarElemente-1;i++)
 		{
 			vizualizare << stea.compozitie[i] << ", ";
+		}
+		vizualizare << stea.compozitie[stea.numarElemente - 1];
+	}
+	vizualizare << endl;
+	return vizualizare;
+}
+
+//relatie de "has a" cu clasa stea
+class Constelatie {
+private:
+	const int idConstelatie;
+	string denumire;
+	int varstaConstelatie;
+	float distanta;
+	int nrStele;
+	Stea* stele;
+public:
+	
+	Constelatie(): idConstelatie(1)
+	{
+		this->denumire = "NoName";
+		this->varstaConstelatie = 0;
+		this->distanta = 0.0;
+		this->nrStele = 0;
+		this->stele = NULL;
+	}
+
+	Constelatie(int id, string nume, int varsta, float distanta, int nr, Stea* stele) : idConstelatie(id), denumire(nume), varstaConstelatie(varsta), distanta(distanta), nrStele(nr)
+	{
+		if (this->nrStele != 0)
+		{
+			this->stele = new Stea[this->nrStele];
+			for (int i = 0; i < this->nrStele; i++)
+			{
+				this->stele[i] = stele[i];
+			}
+		}
+		else
+		{
+			this->stele = NULL;
+		}
+	}
+
+
+	Constelatie(const Constelatie& constelatie): idConstelatie(constelatie.idConstelatie)
+	{
+		this->denumire = constelatie.denumire;
+		this->varstaConstelatie = constelatie.varstaConstelatie;
+		this->distanta = constelatie.distanta;
+		this->nrStele = constelatie.nrStele;
+		if (nrStele != 0)
+		{
+			this->stele = new Stea[nrStele];
+			for (int i = 0;i < nrStele;i++)
+			{
+				this->stele[i] = constelatie.stele[i];
+			}
+		}
+		else
+		{
+			this->stele = NULL;
+		}
+	}
+
+	~Constelatie()
+	{
+		if (this->stele != NULL)
+		{
+			delete[]this->stele;
+		}
+	}
+
+	const int getIdConstelatie()
+	{
+		return this->idConstelatie;
+	}
+
+	void setDenumire(string denumire)
+	{
+		if (denumire.length() > 3)
+		{
+			this->denumire = denumire;
+		}
+	}
+
+	string getDenumire()
+    {
+		return this->denumire;
+	}
+
+	void setVarstaConstelatie(int varsta)
+	{
+		if (varsta > 0)
+		{
+			this->varstaConstelatie = varsta;
+		}
+	}
+
+	int getVarstaConstelatie()
+	{
+		return this->varstaConstelatie;
+	}
+
+	void setDistanta(float distanta)
+	{
+		if (distanta > 0.0)
+		{
+			this->distanta = distanta;
+		}
+	}
+
+	float getDistanta()
+	{
+		return this->distanta;
+	}
+
+	void setStele(int nrStele, Stea* stele)
+	{
+		if (nrStele > 0)
+		{
+			this->nrStele = nrStele;
+			if (this->stele != NULL)
+			{
+				delete[]this->stele;
+			}
+			this->stele = new Stea[nrStele];
+			for (int i = 0;i < nrStele;i++)
+			{
+				this->stele[i] = stele[i];
+			}
+		}
+	}
+
+	Stea* getStele()
+	{
+		return this->stele;
+	}
+
+
+	Constelatie operator+=(const Constelatie& constelatie)
+	{
+		int aux = this->nrStele;
+		this->nrStele += constelatie.nrStele;
+		Stea* vector = new Stea[this->nrStele];
+		for (int i = 0;i < aux;i++)
+		{
+			vector[i] = this->stele[i];
+		}
+		for (int i = aux;i < this->nrStele;i++)
+		{
+			vector[i] = constelatie.stele[i - aux];
+		}
+		if (this->stele != NULL)
+		{
+			delete[]this->stele;
+		}
+		this->stele = vector;
+		return *this;
+	}
+
+
+    bool operator==(const Constelatie& altaConstelatie)
+	const{
+		return this->nrStele == altaConstelatie.nrStele;
+
+	}
+	
+	friend ostream& operator<<(ostream& vizualizare, const Constelatie& constelatie);
+
+};
+
+ostream& operator<<(ostream& vizualizare, const Constelatie& constelatie)
+{
+	vizualizare << "Constelatia " << constelatie.denumire <<" cu id-ul "<< constelatie.idConstelatie << " are varsta de " << constelatie.varstaConstelatie << " miliarde de ani si o distanta de " << constelatie.distanta << " ani lumina." << "In aceasta constelatie se regasesc " << constelatie.nrStele << " stele." << endl;
+	vizualizare << "Cateva stele ar fi: ";
+	if (constelatie.nrStele == 0)
+	{
+		vizualizare << "Nicio stea.";
+	}
+	else
+	{
+
+		for (int i = 0;i < constelatie.nrStele;i++)
+		{
+			vizualizare << constelatie.stele[i] << endl;
 
 		}
 	}
 	vizualizare << endl;
 	return vizualizare;
 }
-
 
 class Galaxie
 {
@@ -623,7 +806,6 @@ public:
 		this->nume = "NoName";
 		this->numarTipuriStele = 0;
 		this->denumireTipuriStele = NULL;
-		numarGalaxii++;
 	}
 
 	Galaxie(int id, string nume, int numarTipuriStele, string* denumireTipuriStele): id(id), nume(nume), numarTipuriStele(numarTipuriStele)
@@ -635,7 +817,6 @@ public:
 			{
 				this->denumireTipuriStele[i] = denumireTipuriStele[i];
 			}
-			numarGalaxii++;
 		}
 		else
 		{
@@ -648,7 +829,6 @@ public:
 		this->nume = nume;
 		this->numarTipuriStele = 0;
 		this->denumireTipuriStele = NULL;
-		numarGalaxii++;
 	}
 
 	Galaxie(const Galaxie& galaxie) : id(galaxie.id)
@@ -814,7 +994,7 @@ public:
 	}
 
 	bool operator!=(const Galaxie& altaGalaxie)
-	{
+	const{
 		return this->numarTipuriStele != altaGalaxie.numarTipuriStele;
 
 	}
@@ -861,61 +1041,61 @@ ostream& operator<<(ostream& vizualizare, const Galaxie& galaxie)
 
 void main()
 {
-	/*Planeta planeta1;
-	cout<<planeta1;
+	//Planeta planeta1;
+	//cout<<planeta1;
 
-	string* denumireTari = new string[4];
-	denumireTari[0] = "Islanda";
-	denumireTari[1] = "Elvetia";
-	denumireTari[2] = "Turcia";
-	denumireTari[3] = "Norvegia";
-	Planeta planeta2(2, "Pamant", 12742, 4, denumireTari);
-	cout<<planeta2;
-	
-	Planeta planeta3(3, "Marte", 6779);
-	cout << planeta3;
+	//string* denumireTari = new string[4];
+	//denumireTari[0] = "Islanda";
+	//denumireTari[1] = "Elvetia";
+	//denumireTari[2] = "Turcia";
+	//denumireTari[3] = "Norvegia";
+	//Planeta planeta2(2, "Pamant", 12742, 4, denumireTari);
+	//cout<<planeta2;
+	//
+	//Planeta planeta3(3, "Marte", 6779);
+	//cout << planeta3;
 
-	cout << "Numarul total de planete: " << Planeta::getNumarPlanete() << endl;
+	//cout << "Numarul total de planete: " << Planeta::getNumarPlanete() << endl;
 
-	cout << "Volumul planetei Marte: " << getVolum(planeta3) << " unitati cubice." << endl;
+	//cout << "Volumul planetei Marte: " << getVolum(planeta3) << " unitati cubice." << endl;
 
 
-	Planeta planeta01(planeta1);
-	cout<<planeta1;
-	cout << endl;
-    
-	planeta3 = planeta3;
-	cout<<planeta3;
+	//Planeta planeta01(planeta1);
+	//cout<<planeta1;
+	//cout << endl;
+ //   
+	//planeta3 = planeta3;
+	//cout<<planeta3;
 
-	planeta01.setNume("Mercur");
-	cout << planeta01.getNume() << endl;
+	//planeta01.setNume("Mercur");
+	//cout << planeta01.getNume() << endl;
 
-	cout << planeta01.getId() << endl;
+	//cout << planeta01.getId() << endl;
 
-	planeta01.setDiametru(4879.4);
-	cout << planeta01.getDiametru() << endl;
+	//planeta01.setDiametru(4879.4);
+	//cout << planeta01.getDiametru() << endl;
 
-	string* tari = new string[3]{ "Calidora", "Heliospica", "Mercuria" }; //acestea sunt denumiri fictive
-	planeta01.setTari(3, tari);
-	cout << planeta01 << endl;
+	//string* tari = new string[3]{ "Calidora", "Heliospica", "Mercuria" }; //acestea sunt denumiri fictive
+	//planeta01.setTari(3, tari);
+	//cout << planeta01 << endl;
 
-	cout << "Un prim exemplu de tara ar fi: " << planeta01.getDenumiriTari()[0] << endl;
-	cout << "Un alt exemplu de tara ar fi: "<< planeta01.getDenumireTara(2) << endl;
-	
-	Planeta planeta02;
-	planeta1 = planeta01 + planeta02;
-	cout<<planeta1;
+	//cout << "Un prim exemplu de tara ar fi: " << planeta01.getDenumiriTari()[0] << endl;
+	//cout << "Un alt exemplu de tara ar fi: "<< planeta01.getDenumireTara(2) << endl;
+	//
+	//Planeta planeta02;
+	//planeta1 = planeta01 + planeta02;
+	//cout<<planeta1;
 
-	
-    cout << "Forma initiala a planetei Mercur: " << planeta01 << endl;
-    Planeta planeta4;
-	planeta4 = ++planeta01;
-	cout << "Forma planetei Mercur dupa preincrementare: " << planeta4 << endl;
-	Planeta planeta5;
-	planeta5 = planeta01++;
-	cout << "Forma planetei Mercur dupa postincrementare: " << planeta5 << endl;
+	//
+ //   cout << "Forma initiala a planetei Mercur: " << planeta01 << endl;
+ //   Planeta planeta4;
+	//planeta4 = ++planeta01;
+	//cout << "Forma planetei Mercur dupa preincrementare: " << planeta4 << endl;
+	//Planeta planeta5;
+	//planeta5 = planeta01++;
+	//cout << "Forma planetei Mercur dupa postincrementare: " << planeta5 << endl;
 
-    cout << "Sirul tarilor de pe planeta Mercur: " << getSirTari(planeta01)<<endl;
+ //   cout << "Sirul tarilor de pe planeta Mercur: " << getSirTari(planeta01)<<endl;
 
     Stea stea1;
 	cout<<stea1;
@@ -976,119 +1156,162 @@ void main()
 	
     cout << "Sirul elementelor din compozitia stelei Arcturus: " << getSirElemente(stea01) << endl;
 
-	Galaxie galaxie1;
-	cout << galaxie1;
+	
+	Constelatie constelatie1;
+	cout << constelatie1;
 
-	string* denumireTipuriStele = new string[3];
-	denumireTipuriStele[0] = "Nanosecvente";
-	denumireTipuriStele[1] = "Nanogigante";
-	denumireTipuriStele[2] = "Supernovele";
-	Galaxie galaxie2(2, "Andromeda", 3, denumireTipuriStele);
-    cout<<galaxie2;
+	Stea* stele = new Stea[2];
+	stele[0] = stea1;
+	stele[1] = stea2;
+	Constelatie constelatie2(2, "Ursa Mare", 4, 50.0, 2, stele); //acesta nu este un exemplu real
+	cout << constelatie2;
 
-	Galaxie galaxie3(3, "Fluture");
-	cout << galaxie3;
-	cin >> galaxie3;
-	cout << galaxie3;
-
-	cout << "Numarul total de galaxii: " << Galaxie::getNumarGalaxii() << endl;
-
-	cout << "Masa totala a galaxiei Fluture: " << getMasaTotala(galaxie3) << " kg." << endl;
-
-
-	Galaxie galaxie01(galaxie1);
-	cout << galaxie01;
+	Constelatie constelatie01(constelatie1);
+	cout << constelatie01;
 	cout << endl;
 
-	galaxie3 = galaxie3;
-	cout << galaxie3;
+	cout << constelatie01.getIdConstelatie() << endl;
 
-	galaxie01.setNume("Compasul");
-	cout << galaxie01.getNume() << endl;
+	constelatie01.setDenumire("Pisces");
+	cout << constelatie01.getDenumire() << endl;
 
-	cout << galaxie01.getId() << endl;
+	constelatie01.setVarstaConstelatie(5);
+	cout << constelatie01.getVarstaConstelatie() << endl;
 
-	string* tipuriStele = new string[5]{ "Pitice rosii", "Pitice albe", "Gigante rosii", "Gigante portocalii", "Gigante albastre"};
-	galaxie01.setTipuriStele(5, tipuriStele);
-	cout << galaxie01 << endl;
+	constelatie01.setDistanta(67.0);
+	cout << constelatie01.getDistanta() << endl;
 
-	cout << "Un prim exemplu de tip de stea ar fi: " << galaxie01.getDenumiriTipuriStele()[0] << endl;
-	cout << "Un alt exemplu de tip de stea ar fi:" << galaxie01.getDenumireTipStea(3) << endl;
+	Stea* sstele = new Stea[2] { stea01,stea3 };
+	constelatie01.setStele(2, sstele);
+	cout << constelatie01 << endl;
 
-    cout << "Sirul tipurilor de stele din prima galaxie: " << getSirTipuriStele(galaxie01) << endl;
-	
-	Galaxie galaxie4;
-	if (galaxie3 != galaxie4)
+	cout << "Prima stea din constelatia Pisces este " << constelatie01.getStele()[0] << endl;
+
+	constelatie1 += constelatie2;
+
+	if (constelatie1 == constelatie01) 
 	{
-		cout << "Cele doua galaxii au numar diferit de tipuri de stele.";
+		cout << "Cele doua constelatii au un numar egal de stele.";
 	}
 	else
 	{
-		cout<< "Cele doua galaxii au acelasi numar de tipuri de stele.";
-	} */
-	
-    int n;
-	cout << "\nNumar planete: ";
-	cin >> n;
-	Planeta* planete = new Planeta[n];
-	for (int i = 0;i < n;i++)
-	{
-		cin >> planete[i];
+		cout << "Cele doua constelatii au un numar diferit de stele.";
 	}
-	for (int i = 0;i < n;i++)
-	{
-		cout << planete[i];
-	}
-	delete[]planete;
+		
 
-	cout << "\nNumar stele: ";
-	cin >> n;
-	Stea* stele = new Stea[n];
-	for (int i = 0;i < n;i++)
-	{
-		cin >> stele[i];
-	}
-	for (int i = 0;i < n;i++)
-	{
-		cout << stele[i];
-	}
-	delete[]stele;
+	//Galaxie galaxie1;
+	//cout << galaxie1;
 
-	cout << "\nNumar galaxii: ";
-	cin >> n;
-	Galaxie* galaxii = new Galaxie[n];
-	for (int i = 0;i < n;i++)
-	{
-		cin >> galaxii[i];
-	}
-	for (int i = 0;i < n;i++)
-	{
-		cout << galaxii[i];
-	}
-	delete[]galaxii;
+	//string* denumireTipuriStele = new string[3];
+	//denumireTipuriStele[0] = "Nanosecvente";
+	//denumireTipuriStele[1] = "Nanogigante";
+	//denumireTipuriStele[2] = "Supernovele";
+	//Galaxie galaxie2(2, "Andromeda", 3, denumireTipuriStele);
+ //   cout<<galaxie2;
 
-	cout << "\nLiniile si coloanele matricei planeta: ";
-	cin >> n;
-	Planeta** matricePlaneta = new Planeta * [n];
-	for (int i = 0;i < n;i++)
-	{
-		matricePlaneta[i] = new Planeta[n];
-		for (int j = 0;j < n;j++)
-		{
-			cin >> matricePlaneta[i][j];
-		}
-	}
-	for (int i = 0;i < n;i++) 
-	{
-		for(int j = 0;j < n;j++)
-		{
-			cout << matricePlaneta[i][j];
-		}
-	}
-	for (int i = 0;i < n;i++)
-	{
-		delete[]matricePlaneta[i];
-	}
-	delete[]matricePlaneta;
+	//Galaxie galaxie3(3, "Fluture");
+	//cout << galaxie3;
+	//cin >> galaxie3;
+	//cout << galaxie3;
+
+	//cout << "Numarul total de galaxii: " << Galaxie::getNumarGalaxii() << endl;
+
+	//cout << "Masa totala a galaxiei Fluture: " << getMasaTotala(galaxie3) << " kg." << endl;
+
+
+	//Galaxie galaxie01(galaxie1);
+	//cout << galaxie01;
+	//cout << endl;
+
+	//galaxie3 = galaxie3;
+	//cout << galaxie3;
+
+	//galaxie01.setNume("Compasul");
+	//cout << galaxie01.getNume() << endl;
+
+	//cout << galaxie01.getId() << endl;
+
+	//string* tipuriStele = new string[5]{ "Pitice rosii", "Pitice albe", "Gigante rosii", "Gigante portocalii", "Gigante albastre"};
+	//galaxie01.setTipuriStele(5, tipuriStele);
+	//cout << galaxie01 << endl;
+
+	//cout << "Un prim exemplu de tip de stea ar fi: " << galaxie01.getDenumiriTipuriStele()[0] << endl;
+	//cout << "Un alt exemplu de tip de stea ar fi:" << galaxie01.getDenumireTipStea(3) << endl;
+
+ //   cout << "Sirul tipurilor de stele din prima galaxie: " << getSirTipuriStele(galaxie01) << endl;
+	//
+	//Galaxie galaxie4;
+	//if (galaxie3 != galaxie4)
+	//{
+	//	cout << "Cele doua galaxii au numar diferit de tipuri de stele.";
+	//}
+	//else
+	//{
+	//	cout<< "Cele doua galaxii au acelasi numar de tipuri de stele.";
+	//} 
+	//
+ //   int n;
+	//cout << "\nNumar planete: ";
+	//cin >> n;
+	//Planeta* planete = new Planeta[n];
+	//for (int i = 0;i < n;i++)
+	//{
+	//	cin >> planete[i];
+	//}
+	//for (int i = 0;i < n;i++)
+	//{
+	//	cout << planete[i];
+	//}
+	//delete[]planete;
+
+	//cout << "\nNumar stele: ";
+	//cin >> n;
+	//Stea* stele = new Stea[n];
+	//for (int i = 0;i < n;i++)
+	//{
+	//	cin >> stele[i];
+	//}
+	//for (int i = 0;i < n;i++)
+	//{
+	//	cout << stele[i];
+	//}
+	//delete[]stele;
+
+	//cout << "\nNumar galaxii: ";
+	//cin >> n;
+	//Galaxie* galaxii = new Galaxie[n];
+	//for (int i = 0;i < n;i++)
+	//{
+	//	cin >> galaxii[i];
+	//}
+	//for (int i = 0;i < n;i++)
+	//{
+	//	cout << galaxii[i];
+	//}
+	//delete[]galaxii;
+
+	//cout << "\nLiniile si coloanele matricei planeta: ";
+	//cin >> n;
+	//Planeta** matricePlaneta = new Planeta * [n];
+	//for (int i = 0;i < n;i++)
+	//{
+	//	matricePlaneta[i] = new Planeta[n];
+	//	for (int j = 0;j < n;j++)
+	//	{
+	//		cin >> matricePlaneta[i][j];
+	//	}
+	//}
+	//for (int i = 0;i < n;i++) 
+	//{
+	//	for(int j = 0;j < n;j++)
+	//	{
+	//		cout << matricePlaneta[i][j];
+	//	}
+	//}
+	//for (int i = 0;i < n;i++)
+	//{
+	//	delete[]matricePlaneta[i];
+	//}
+	//delete[]matricePlaneta;
 
   }
