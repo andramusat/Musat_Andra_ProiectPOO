@@ -3,6 +3,7 @@
 #include<fstream>
 #include<iomanip>
 #include<windows.h>
+#define _CRT_SECURE_NO_WARNINGS
 using namespace std;
 
 //DOMENIUL ASTRONOMIE
@@ -168,6 +169,11 @@ public:
 		return this->diametru;
 	}
 
+	int getNumarTari()
+	{
+		return this->numarTari;
+	}
+
 	void setTari(int numarTari, string* denumire)
 	{
 		if (numarTari > 0)
@@ -177,7 +183,7 @@ public:
 			{
 				delete[]this->denumireTari;
 			}
-			this->denumireTari = new string[numarTari];
+			this->denumireTari = new string[this->numarTari];
 			for (int i = 0;i < numarTari;i++)
 			{
 				this->denumireTari[i] = denumire[i];
@@ -317,6 +323,50 @@ public:
 		}
 		return in;
 	}
+
+	void scrieInFisierBinar(string numeFisier)
+	{
+		ofstream f(numeFisier, ios::binary | ios::out);
+		int lungimeNume = nume.length() + 1;
+		f.write((char*)&lungimeNume, sizeof(int));
+		f.write((char*)nume.c_str(), lungimeNume);
+		f.write((char*)&diametru, sizeof(float));
+		f.write((char*)&numarTari, sizeof(int));
+		for (int i = 0; i < numarTari; ++i) {
+			int lungimeDenumireTara = this->denumireTari[i].length() + 1;
+			f.write((char*)&lungimeDenumireTara, sizeof(int));
+			f.write(denumireTari[i].c_str(), lungimeDenumireTara);
+		}
+		f.close();
+	}
+
+
+	void citesteDinFisierBinar(string numeFisier)
+	{
+		ifstream f(numeFisier, ios::binary | ios::in);
+		int lungimeNume;
+		f.read((char*)&lungimeNume, sizeof(int));
+		char* bufferNume = new char[lungimeNume];
+		f.read((char*)bufferNume, lungimeNume);
+		nume = bufferNume;
+		delete[] bufferNume;
+		f.read((char*)&diametru, sizeof(float));
+		f.read((char*)&numarTari, sizeof(int));
+		if (denumireTari != 0)
+		{
+			delete[]denumireTari;
+		}
+		denumireTari = new string[numarTari];
+		for (int i = 0; i < numarTari; i++) {
+			int lungimeDenumireTari;
+			f.read((char*)&lungimeDenumireTari, sizeof(int));
+			char* bufferDenumireTari = new char[lungimeDenumireTari];
+			f.read(bufferDenumireTari, lungimeDenumireTari);
+			denumireTari[i] = bufferDenumireTari;
+			delete[] bufferDenumireTari;
+		}
+		f.close();
+	}
 };
 
 int Planeta::numarPlanete = 9;
@@ -366,6 +416,124 @@ ostream& green(ostream& out)
 	SetConsoleTextAttribute(standardOutput, FOREGROUND_GREEN);
 	return out;
 }
+
+class SmartPlanet: public Planeta
+{
+private:
+	int varstaTehnologie;
+	char* denumireTehnologie;
+public:
+
+	SmartPlanet() : Planeta()
+	{
+		this->varstaTehnologie = 0;
+		this->denumireTehnologie = new char[strlen("Tehnologie necunoscuta") + 1];
+		strcpy_s(this->denumireTehnologie, strlen("Tehnologie necunoscuta") + 1, "Tehnologie necunoscuta");
+	}
+
+	SmartPlanet(int vartsaTehnologie, const char* denumireTehnologie, string nume, float diametru, int numarTari, string* denumireTari) :Planeta(2, nume, diametru, numarTari, denumireTari)
+	{
+		this->varstaTehnologie = varstaTehnologie;
+		this->denumireTehnologie = new char[strlen(denumireTehnologie) + 1];
+		strcpy_s(this->denumireTehnologie, strlen(denumireTehnologie) + 1, denumireTehnologie);
+	}
+
+	SmartPlanet(int varstaTehnologie, const char* denumireTehnologie) : Planeta(3, "Marte", 6779)
+	{
+		this->varstaTehnologie = varstaTehnologie;
+		this->denumireTehnologie = new char[strlen(denumireTehnologie) + 1];
+		strcpy_s(this->denumireTehnologie, strlen(denumireTehnologie) + 1, denumireTehnologie);
+	}
+
+	SmartPlanet(const SmartPlanet& sp) : Planeta(sp)
+	{
+		this->varstaTehnologie = sp.varstaTehnologie;
+		this->denumireTehnologie = new char[strlen(sp.denumireTehnologie) + 1];
+		strcpy_s(this->denumireTehnologie, strlen(sp.denumireTehnologie) + 1, sp.denumireTehnologie);
+	}
+
+	SmartPlanet operator=(const SmartPlanet& sp)
+	{
+		if (this != &sp)
+		{
+			Planeta::operator=(sp);
+			this->varstaTehnologie = sp.varstaTehnologie;
+			if (this->denumireTehnologie != NULL)
+			{
+				delete[]this->denumireTehnologie;
+			}
+			this->denumireTehnologie = new char[strlen(sp.denumireTehnologie) + 1];
+			strcpy_s(this->denumireTehnologie, strlen(sp.denumireTehnologie) + 1, sp.denumireTehnologie);
+		}
+		return *this;
+	}
+
+	~SmartPlanet()
+	{
+		if (this->denumireTehnologie != NULL)
+		{
+			delete[]this->denumireTehnologie;
+		}
+	}
+
+	void setVarstaTehnologie(int varstaTehnologie)
+	{
+		if (varstaTehnologie > 0)
+		{
+			this->varstaTehnologie = varstaTehnologie;
+		}
+	}
+
+	int getVarstaTehnologie()
+	{
+		return this->varstaTehnologie;
+	}
+
+	void setDenumireTehnologie(const char* denumire)
+	{
+		if (strlen(denumire) > 0)
+		{
+			if (this->denumireTehnologie != NULL)
+			{
+				delete[]this->denumireTehnologie;
+			}
+			this->denumireTehnologie = new char[strlen(denumire) + 1];
+			strcpy_s(this->denumireTehnologie, strlen(denumire)+1, denumire);
+		}
+	}
+
+	void InvechireaTehnologiei(int ani)
+	{
+		varstaTehnologie += ani;
+	}
+
+	friend ostream& operator<<(ostream& out, const SmartPlanet& sp)
+	{
+		out << "Planeta Smart: " << (Planeta)sp << endl;
+		out << "Varsta Tehnologiei: " << sp.varstaTehnologie << endl;
+		out << "Numele Tehnologiei: " << sp.denumireTehnologie << " " << endl;
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, SmartPlanet& sp)
+	{
+		cout << "Planeta Smart: ";
+		in >> (Planeta&)sp;
+		cout << "Varsta tehnologiei: ";
+		in >> sp.varstaTehnologie;
+		if (sp.denumireTehnologie != NULL)
+		{
+			delete[]sp.denumireTehnologie;
+		}
+		cout << "Denumirea tehnologiei: ";
+		char buffer[30];
+		in >> buffer;
+		sp.denumireTehnologie = new char[strlen(buffer) + 1];
+		strcpy_s(sp.denumireTehnologie, strlen(buffer) + 1, buffer);
+		return in;
+	}
+
+};
 
 class Stea
 {
@@ -552,7 +720,7 @@ public:
 			{
 				delete[]this->compozitie;
 			}
-			this->compozitie = new string[numarElemente];
+			this->compozitie = new string[this->numarElemente];
 			for (int i = 0;i < numarElemente;i++)
 			{
 				this->compozitie[i] = comp[i];
@@ -722,7 +890,6 @@ ostream& red(ostream& out)
 //relatie de "has a" cu clasa stea
 class Constelatie {
 private:
-	const int idConstelatie;
 	string denumire;
 	int varstaConstelatie;
 	float distanta;
@@ -730,7 +897,7 @@ private:
 	Stea* stele;
 public:
 	
-	Constelatie(): idConstelatie(1)
+	Constelatie()
 	{
 		this->denumire = "NoName";
 		this->varstaConstelatie = 0;
@@ -739,7 +906,7 @@ public:
 		this->stele = NULL;
 	}
 
-	Constelatie(int id, string nume, int varsta, float distanta, int nr, Stea* stele) : idConstelatie(id), denumire(nume), varstaConstelatie(varsta), distanta(distanta), nrStele(nr)
+	Constelatie(string nume, int varsta, float distanta, int nr, Stea* stele) : denumire(nume), varstaConstelatie(varsta), distanta(distanta), nrStele(nr)
 	{
 		if (this->nrStele != 0)
 		{
@@ -756,7 +923,7 @@ public:
 	}
 
 
-	Constelatie(const Constelatie& constelatie): idConstelatie(constelatie.idConstelatie)
+	Constelatie(const Constelatie& constelatie)
 	{
 		this->denumire = constelatie.denumire;
 		this->varstaConstelatie = constelatie.varstaConstelatie;
@@ -810,11 +977,6 @@ public:
 		{
 			delete[]this->stele;
 		}
-	}
-
-	const int getIdConstelatie()
-	const {
-		return this->idConstelatie;
 	}
 
 	void setDenumire(string denumire)
@@ -913,7 +1075,7 @@ public:
 
 ostream& operator<<(ostream& vizualizare, const Constelatie& constelatie)
 {
-	vizualizare << "Constelatia " << constelatie.getDenumire() <<" cu id-ul "<< constelatie.getIdConstelatie() << " are varsta de " << constelatie.varstaConstelatie << " miliarde de ani si o distanta de " << constelatie.distanta << " ani lumina." << "\nIn aceasta constelatie se regasesc " << constelatie.nrStele << " stele.";
+	vizualizare << "Constelatia " << constelatie.getDenumire() << " are varsta de " << constelatie.varstaConstelatie << " miliarde de ani si o distanta de " << constelatie.distanta << " ani lumina." << "\nIn aceasta constelatie se regasesc " << constelatie.nrStele << " stele.";
 	vizualizare << "\nCateva stele ar fi: ";
 	if (constelatie.nrStele == 0)
 	{
@@ -1242,6 +1404,213 @@ ostream& intensity(ostream& out)
 	return out;
 }
 
+class GalaxieStralucitoare : public Galaxie
+{
+private:
+	float stralucire;
+	int nrAni;
+	int* nasteriStelePeAn;
+public:
+
+	GalaxieStralucitoare() :Galaxie()
+	{
+		this->stralucire = 0.0;
+		this->nrAni = 0;
+		this->nasteriStelePeAn = NULL;
+	}
+
+	GalaxieStralucitoare(float stralucire, int nrAni, float* nasteriStelePeAn, string nume, int numarTipuriStele, string* denumireTipuriStele) : Galaxie(2, nume, numarTipuriStele, denumireTipuriStele)
+	{
+		this->stralucire = stralucire;
+		this->nrAni = nrAni;
+		if (nrAni != 0)
+		{
+			this->nasteriStelePeAn = new int[nrAni];
+			for (int i = 0; i < this->nrAni; i++)
+			{
+				this->nasteriStelePeAn[i] = nasteriStelePeAn[i];
+			}
+		}
+		else
+		{
+			this->nasteriStelePeAn = NULL;
+		}
+	}
+    
+	GalaxieStralucitoare(float stralucire) : Galaxie(3, "Fluture")
+	{
+		this->stralucire = stralucire;
+		this->nrAni = 7690;
+		this->nasteriStelePeAn = new int[nrAni];
+		for (int i = 0;i < this->nrAni;i++)
+		{
+			this->nasteriStelePeAn[i] = 89;
+		}
+	}
+	
+
+	GalaxieStralucitoare(const GalaxieStralucitoare& gs) :Galaxie(gs)
+	{
+		this->stralucire = gs.stralucire;
+		this->nrAni = gs.nrAni;
+		if (this->nrAni > 0)
+		{
+			this->nasteriStelePeAn = new int[this->nrAni];
+			for (int i = 0;this->nrAni;i++)
+			{
+				this->nasteriStelePeAn[i] = gs.nasteriStelePeAn[i];
+			}
+		}
+		else
+		{
+			this->nasteriStelePeAn = NULL;
+		}
+	}
+
+	GalaxieStralucitoare operator=(const GalaxieStralucitoare& gs)
+	{
+		if (this != &gs)
+		{
+			Galaxie::operator=(gs);
+			this->stralucire = gs.stralucire;
+			this->nrAni = gs.nrAni;
+			if (this->nasteriStelePeAn != NULL)
+			{
+				delete[]this->nasteriStelePeAn;
+			}
+			if (this->nrAni > 0)
+			{
+				this->nasteriStelePeAn = new int[this->nrAni];
+				for (int i = 0;i < this->nrAni;i++)
+				{
+					this->nasteriStelePeAn[i] = gs.nasteriStelePeAn[i];
+				}
+			}
+			else
+			{
+				this->nasteriStelePeAn = NULL;
+			}
+		}
+		return *this;
+	}
+
+	~GalaxieStralucitoare()
+	{
+		if (this->nasteriStelePeAn != NULL)
+		{
+			delete[]this->nasteriStelePeAn;
+		}
+	}
+
+	void setStralucire(float stralucire) 
+    {
+		if (stralucire > 0.0)
+		{
+			this->stralucire = stralucire;
+		}
+    }
+
+	float getStralucire()
+	{
+		return this->stralucire;
+	}
+
+	int getVarsta()
+	{
+		return this->nrAni;
+	}
+
+	void setVarsta(int numar, int* nasteri)
+	{
+		if (nrAni > 0)
+		{
+			this->nrAni = numar;
+			if (this->nasteriStelePeAn != NULL)
+			{
+				delete[]this->nasteriStelePeAn;
+			}
+			this->nasteriStelePeAn = new int[this->nrAni];
+			for (int i = 0;i < nrAni;i++)
+			{
+				this->nasteriStelePeAn[i] = nasteri[i];
+			}
+		}
+	}
+
+	int* getNasteri()
+	{
+		return this->nasteriStelePeAn;
+	}
+	
+	friend ostream& operator<<(ostream& out, const GalaxieStralucitoare& gs)
+	{
+		out << "Galaxia: " << (Galaxie)gs << endl;
+		out << "Stralucire: " << gs.stralucire << endl;
+		out << "Varsta: " << gs.nrAni;
+		out << "\nCate stele apar pe an: ";
+		if (gs.nrAni == 0)
+		{
+			out << "Niciun nascut.";
+		}
+		else
+		{
+
+			for (int i = 0;i < gs.nrAni-1;i++)
+			{
+				out << gs.nasteriStelePeAn[i] << ", ";
+
+			}
+			out << gs.nasteriStelePeAn[gs.nrAni - 1] << ".";
+		}
+		out << endl;
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, GalaxieStralucitoare& gs)
+	{
+		cout << "Galaxia: ";
+		in >> (Galaxie&)gs;
+		cout << "Stralucirea: ";
+		in >> gs.stralucire;
+		cout << "Varsta: ";
+		in >> gs.nrAni;
+		if (gs.nasteriStelePeAn != NULL)
+		{
+			delete[]gs.nasteriStelePeAn;
+		}
+		if (gs.nrAni > 0)
+		{
+			gs.nasteriStelePeAn = new int[gs.nrAni];
+			for (int i = 0;i < gs.nrAni;i++)
+			{
+				cout << "Cate stele apar pe an" << i + 1 << ": ";
+				in>> gs.nasteriStelePeAn[i];
+			}
+		}
+		else
+		{
+			cout << "Nicio nastere." << endl;
+			gs.nasteriStelePeAn = NULL;
+		}
+		return in;
+	}
+
+
+	int calculeazaNasteriInToatal()
+	{
+		int s = 0;
+		if (nrAni > 0)
+		{
+			for (int i = 0;i < nrAni;i++)
+			{
+				s++;
+			}
+		}
+		return s;
+	}
+
+};
+
 void main()
 {
 	//Planeta planeta1;
@@ -1359,14 +1728,14 @@ void main()
 	//
  //   cout << "Sirul elementelor din compozitia stelei Arcturus: " << getSirElemente(stea01) << endl;
 
-	
+	////faza 5 cu relatie "has a"
 	//Constelatie constelatie1;
 	//cout << constelatie1;
 
 	//Stea* stele = new Stea[2];
 	//stele[0] = stea1;
 	//stele[1] = stea2;
-	//Constelatie constelatie2(2, "Ursa Mare", 4, 50.0, 2, stele); //acesta nu este un exemplu real
+	//Constelatie constelatie2("Ursa Mare", 4, 50.0, 2, stele); //acesta nu este un exemplu real
 	//cout << constelatie2;
 
 	//Constelatie constelatie01(constelatie1);
@@ -1376,8 +1745,6 @@ void main()
 	//Constelatie constelatie3;
 	//constelatie3 = constelatie2;
 	//cout << constelatie3 << endl;
-
-	//cout << constelatie01.getIdConstelatie() << endl;
 
 	//constelatie01.setDenumire("Pisces");
 	//cout << constelatie01.getDenumire() << endl;
@@ -1404,7 +1771,7 @@ void main()
 	//{
 	//	cout << "Cele doua constelatii au un numar diferit de stele.";
 	//}
-		
+
 
 	//Galaxie galaxie1;
 	//cout << galaxie1;
@@ -1456,7 +1823,8 @@ void main()
 	//{
 	//	cout<< "Cele doua galaxii au acelasi numar de tipuri de stele.";
 	//} 
-	//
+	// 
+	////faza 4 cu vectori
  //   int n;
 	//cout << "\nNumar planete: ";
 	//cin >> n;
@@ -1521,11 +1889,11 @@ void main()
 	//}
 	//delete[]matricePlaneta;
 
-
+	//faza 6
 	//lucru cu fisiere text pentru clasele Planeta, Stea si Galaxie
 
   /*  ofstream f("Astronomie.txt", ios::out);
-    Planeta planeta1;
+	Planeta planeta1;
 	cin >> planeta1;
 	Stea stea1;
 	cin >> stea1;
@@ -1536,17 +1904,24 @@ void main()
 	f << galaxie1;
 	f.close();*/
 
-	Planeta planeta2(2, "Marte", 6779);
+	/*Planeta planeta2(2, "Marte", 6779);
 	Stea stea2(2, "Antares", 210000);
 	Galaxie galaxie2(2, "Fluture");
-    ifstream g("Astronimie.txt", ios::in);
+	ifstream g("Astronimie.txt", ios::in);
 	g >> planeta2;
 	cout << green << planeta2;
 	g >> stea2;
 	cout << red << stea2;
 	g >> galaxie2;
 	cout << blue << galaxie2 << intensity;
-    g.close();
+	g.close();*/
 
-//lucru cu fisiere binare pentru clasele Planeta, Stea si Galaxie
+	//lucru cu fisiere binare pentru clasele Planeta, Stea si Galaxie
+	Planeta p1;
+	string f = "fisierBinar.dat";
+	p1.scrieInFisierBinar(f);
+	Planeta p2(20, "NumePlanetaVeric", 20);
+	p2.citesteDinFisierBinar(f);
+	cout << p1 << endl;
+	cout << p2;
   }
