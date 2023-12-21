@@ -324,26 +324,23 @@ public:
 		return in;
 	}
 
-	void scrieInFisierBinar(string numeFisier)
+	void scrieInFisierBinar(fstream& f)
 	{
-		ofstream f(numeFisier, ios::binary | ios::out);
 		int lungimeNume = nume.length() + 1;
 		f.write((char*)&lungimeNume, sizeof(int));
 		f.write((char*)nume.c_str(), lungimeNume);
 		f.write((char*)&diametru, sizeof(float));
 		f.write((char*)&numarTari, sizeof(int));
-		for (int i = 0; i < numarTari; ++i) {
+		for (int i = 0; i < numarTari; i++) {
 			int lungimeDenumireTara = this->denumireTari[i].length() + 1;
 			f.write((char*)&lungimeDenumireTara, sizeof(int));
 			f.write(denumireTari[i].c_str(), lungimeDenumireTara);
 		}
-		f.close();
 	}
 
 
-	void citesteDinFisierBinar(string numeFisier)
+	void citesteDinFisierBinar(fstream& f)
 	{
-		ifstream f(numeFisier, ios::binary | ios::in);
 		int lungimeNume;
 		f.read((char*)&lungimeNume, sizeof(int));
 		char* bufferNume = new char[lungimeNume];
@@ -361,11 +358,10 @@ public:
 			int lungimeDenumireTari;
 			f.read((char*)&lungimeDenumireTari, sizeof(int));
 			char* bufferDenumireTari = new char[lungimeDenumireTari];
-			f.read(bufferDenumireTari, lungimeDenumireTari);
+			f.read((char*)bufferDenumireTari, lungimeDenumireTari);
 			denumireTari[i] = bufferDenumireTari;
 			delete[] bufferDenumireTari;
 		}
-		f.close();
 	}
 };
 
@@ -839,6 +835,50 @@ public:
 		}
 		return in;
 	}
+
+	void scrieInFisierBinar(fstream& f)
+	{
+		int lungimeNume = nume.length() + 1;
+		f.write((char*)&lungimeNume, sizeof(int));
+		f.write((char*)nume.c_str(), lungimeNume);
+		f.write((char*)&temperatura, sizeof(float));
+		f.write((char*)&raza, sizeof(float));
+		f.write((char*)&numarElemente, sizeof(int));
+		for (int i = 0; i < numarElemente; i++)
+		{
+			int lungimeCompozitie = this->compozitie[i].length() + 1;
+			f.write((char*)&lungimeCompozitie, sizeof(int));
+			f.write(compozitie[i].c_str(), lungimeCompozitie);
+		}
+	}
+
+	void cietsteDinFisierBinar(fstream& f)
+	{
+	    int lungimeNume;
+		f.read((char*)&lungimeNume, sizeof(int));
+		char* bufferNume = new char[lungimeNume];
+		f.read((char*)bufferNume, lungimeNume);
+		nume = bufferNume;
+		delete[]bufferNume;
+		f.read((char*)&temperatura, sizeof(float));
+		f.read((char*)&raza, sizeof(float));
+		f.read((char*)&numarElemente, sizeof(int));
+		if(compozitie!=0)
+		{
+			delete[]compozitie;
+		}
+		compozitie = new string[numarElemente];
+		for (int i = 0; i < numarElemente; i++)
+		{
+			int lungimeCompozitie;
+			f.read((char*)&lungimeCompozitie, sizeof(int));
+			char* bufferCompozitie = new char[lungimeCompozitie];
+			f.read((char*)bufferCompozitie, lungimeCompozitie);
+			compozitie[i] = bufferCompozitie;
+			delete[]bufferCompozitie;
+		}
+	}
+
 };
 
 int Stea::numarStele = 0;
@@ -1348,6 +1388,49 @@ public:
 		}
 		return in;
 	}
+	/*string nume;
+	int numarTipuriStele;
+	string* denumireTipuriStele;*/
+
+	void scrieInFisierBinar(fstream& f) 
+	{
+        int lungimeNume = nume.length() + 1;
+		f.write((char*)&lungimeNume, sizeof(int));
+		f.write((char*)nume.c_str(), lungimeNume);
+		f.write((char*)&numarTipuriStele, sizeof(int));
+		for (int i = 0; i < numarTipuriStele;i++)
+		{
+			int lungimeDenumireTipuriStele = this->denumireTipuriStele[i].length() + 1;
+			f.write((char*)&lungimeDenumireTipuriStele, sizeof(int));
+			f.write(denumireTipuriStele[i].c_str(), lungimeDenumireTipuriStele);
+		}
+	}
+
+	void citesteDinFisierBinar(fstream& f) 
+	{
+		int lungimeNume;
+		f.read((char*)&lungimeNume, sizeof(int));
+		char* bufferNume = new char[lungimeNume];
+		f.read((char*)bufferNume, lungimeNume);
+		nume = bufferNume;
+		delete[]bufferNume;
+		f.read((char*)&numarTipuriStele, sizeof(int));
+		if (denumireTipuriStele != 0)
+		{
+			delete[]denumireTipuriStele;
+		}
+		denumireTipuriStele = new string[numarTipuriStele];
+		for (int i = 0;i < numarTipuriStele;i++)
+		{
+			int lungimeDenumireTipuriStele;
+			f.read((char*)&lungimeDenumireTipuriStele, sizeof(int));
+			char* bufferDenumireTipuriStele = new char[lungimeDenumireTipuriStele];
+			f.read((char*)bufferDenumireTipuriStele, lungimeDenumireTipuriStele);
+			denumireTipuriStele[i] = bufferDenumireTipuriStele;
+			delete[]bufferDenumireTipuriStele;
+		}
+	}
+
 };
 
 int Galaxie::numarGalaxii = 0;
@@ -1892,17 +1975,17 @@ void main()
 	//faza 6
 	//lucru cu fisiere text pentru clasele Planeta, Stea si Galaxie
 
-  /*  ofstream f("Astronomie.txt", ios::out);
-	Planeta planeta1;
-	cin >> planeta1;
-	Stea stea1;
-	cin >> stea1;
-	Galaxie galaxie1;
-	cin >> galaxie1;
-	f << planeta1;
-	f << stea1;
-	f << galaxie1;
-	f.close();*/
+ //   ofstream f("Astronomie.txt", ios::out);
+	//Planeta planeta1;
+	//cin >> planeta1;
+	//Stea stea1;
+	////cin >> stea1;
+	//Galaxie galaxie1;
+	//cin >> galaxie1;
+	//f << planeta1;
+	//f << stea1;
+	//f << galaxie1;
+	//f.close();
 
 	/*Planeta planeta2(2, "Marte", 6779);
 	Stea stea2(2, "Antares", 210000);
@@ -1917,11 +2000,39 @@ void main()
 	g.close();*/
 
 	//lucru cu fisiere binare pentru clasele Planeta, Stea si Galaxie
-	Planeta p1;
-	string f = "fisierBinar.dat";
-	p1.scrieInFisierBinar(f);
-	Planeta p2(20, "NumePlanetaVeric", 20);
-	p2.citesteDinFisierBinar(f);
-	cout << p1 << endl;
-	cout << p2;
+	
+    //fstream f("Astronomie.dat", ios::out | ios::binary);
+	string* denumireTari = new string[4];
+	denumireTari[0] = "Islanda";
+	denumireTari[1] = "Elvetia";
+	denumireTari[2] = "Turcia";
+	denumireTari[3] = "Norvegia";
+	Planeta planeta(1, "Pamant", 12742.0, 4, denumireTari);
+
+	string* compozitie = new string[2];
+	compozitie[0] = "Hidrogen";
+	compozitie[1] = "Heliu";
+	Stea stea(1, "Soare", 5778, 696340, 2, compozitie);
+
+	string* denumireTipuriStele = new string[3];
+	denumireTipuriStele[0] = "Nanosecvente";
+	denumireTipuriStele[1] = "Nanogigante";
+	denumireTipuriStele[2] = "Supernovele";
+	Galaxie galaxie(1, "Andromeda", 3, denumireTipuriStele);
+
+	/*planeta.scrieInFisierBinar(f);
+	stea.scrieInFisierBinar(f);
+	galaxie.scrieInFisierBinar(f);
+	f.close();*/
+
+	fstream g("Astronomie.dat", ios::in | ios::binary);
+	planeta.citesteDinFisierBinar(g);
+	cout << green << planeta;
+    stea.cietsteDinFisierBinar(g);
+	cout << red << stea;
+	galaxie.citesteDinFisierBinar(g);
+	cout << blue << galaxie << intensity;
+	g.close();
+
+
   }
