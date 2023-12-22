@@ -427,7 +427,7 @@ public:
 		strcpy_s(this->denumireTehnologie, strlen("Tehnologie necunoscuta") + 1, "Tehnologie necunoscuta");
 	}
 
-	SmartPlanet(int vartsaTehnologie, const char* denumireTehnologie, string nume, float diametru, int numarTari, string* denumireTari) :Planeta(2, nume, diametru, numarTari, denumireTari)
+	SmartPlanet(int varstaTehnologie, const char* denumireTehnologie, string nume, float diametru, int numarTari, string* denumireTari) :Planeta(2, nume, diametru, numarTari, denumireTari)
 	{
 		this->varstaTehnologie = varstaTehnologie;
 		this->denumireTehnologie = new char[strlen(denumireTehnologie) + 1];
@@ -498,14 +498,22 @@ public:
 		}
 	}
 
-	void InvechireaTehnologiei(int ani)
+	char* getDenumireTehnologie() {
+		return this->denumireTehnologie;
+	}
+
+	int InvechireaTehnologiei(int ani)
 	{
-		varstaTehnologie += ani;
+		if (this->varstaTehnologie > 0)
+		{
+			ani += varstaTehnologie;
+		}
+		return ani;
 	}
 
 	friend ostream& operator<<(ostream& out, const SmartPlanet& sp)
 	{
-		out << "Planeta Smart: " << (Planeta)sp << endl;
+		out << "Planeta Smart: " << (Planeta)sp;
 		out << "Varsta Tehnologiei: " << sp.varstaTehnologie << endl;
 		out << "Numele Tehnologiei: " << sp.denumireTehnologie << " " << endl;
 		return out;
@@ -513,7 +521,6 @@ public:
 
 	friend istream& operator>>(istream& in, SmartPlanet& sp)
 	{
-		cout << "Planeta Smart: ";
 		in >> (Planeta&)sp;
 		cout << "Varsta tehnologiei: ";
 		in >> sp.varstaTehnologie;
@@ -1502,7 +1509,7 @@ public:
 		this->nasteriStelePeAn = NULL;
 	}
 
-	GalaxieStralucitoare(float stralucire, int nrAni, float* nasteriStelePeAn, string nume, int numarTipuriStele, string* denumireTipuriStele) : Galaxie(2, nume, numarTipuriStele, denumireTipuriStele)
+	GalaxieStralucitoare(float stralucire, int nrAni, const int* nasteriStelePeAn, string nume, int numarTipuriStele, string* denumireTipuriStele) : Galaxie(2, nume, numarTipuriStele, denumireTipuriStele)
 	{
 		this->stralucire = stralucire;
 		this->nrAni = nrAni;
@@ -1523,7 +1530,7 @@ public:
 	GalaxieStralucitoare(float stralucire) : Galaxie(3, "Fluture")
 	{
 		this->stralucire = stralucire;
-		this->nrAni = 7690;
+		this->nrAni = 1;
 		this->nasteriStelePeAn = new int[nrAni];
 		for (int i = 0;i < this->nrAni;i++)
 		{
@@ -1598,16 +1605,16 @@ public:
 		return this->stralucire;
 	}
 
-	int getVarsta()
+	int getNumarStele()
 	{
 		return this->nrAni;
 	}
 
-	void setVarsta(int numar, int* nasteri)
+	void setNumarStele(int nrAni, int* nasteri)
 	{
 		if (nrAni > 0)
 		{
-			this->nrAni = numar;
+			this->nrAni = nrAni;
 			if (this->nasteriStelePeAn != NULL)
 			{
 				delete[]this->nasteriStelePeAn;
@@ -1627,13 +1634,13 @@ public:
 	
 	friend ostream& operator<<(ostream& out, const GalaxieStralucitoare& gs)
 	{
-		out << "Galaxia: " << (Galaxie)gs << endl;
+		out << "Galaxia: " << (Galaxie)gs;
 		out << "Stralucire: " << gs.stralucire << endl;
-		out << "Varsta: " << gs.nrAni;
-		out << "\nCate stele apar pe an: ";
+		out << "Numar ani in care vor aparea stele: " << gs.nrAni;
+		out << "\nCate stele vor aparea pe an: ";
 		if (gs.nrAni == 0)
 		{
-			out << "Niciun nascut.";
+			out << "Nicio stea aparuta." << endl;
 		}
 		else
 		{
@@ -1643,7 +1650,7 @@ public:
 				out << gs.nasteriStelePeAn[i] << ", ";
 
 			}
-			out << gs.nasteriStelePeAn[gs.nrAni - 1] << ".";
+			out << gs.nasteriStelePeAn[gs.nrAni - 1] << "." << endl;
 		}
 		out << endl;
 		return out;
@@ -1651,11 +1658,10 @@ public:
 
 	friend istream& operator>>(istream& in, GalaxieStralucitoare& gs)
 	{
-		cout << "Galaxia: ";
 		in >> (Galaxie&)gs;
 		cout << "Stralucirea: ";
 		in >> gs.stralucire;
-		cout << "Varsta: ";
+		cout << "Numar ani in care vor aparea stele: ";
 		in >> gs.nrAni;
 		if (gs.nasteriStelePeAn != NULL)
 		{
@@ -1666,13 +1672,13 @@ public:
 			gs.nasteriStelePeAn = new int[gs.nrAni];
 			for (int i = 0;i < gs.nrAni;i++)
 			{
-				cout << "Cate stele apar pe an" << i + 1 << ": ";
+			    cout << "Cate stele vor aparea pe an" << i + 1 << ": ";
 				in>> gs.nasteriStelePeAn[i];
 			}
 		}
 		else
 		{
-			cout << "Nicio nastere." << endl;
+			cout << "Nicio stea aparuta." << endl;
 			gs.nasteriStelePeAn = NULL;
 		}
 		return in;
@@ -1686,7 +1692,7 @@ public:
 		{
 			for (int i = 0;i < nrAni;i++)
 			{
-				s++;
+				s+=nasteriStelePeAn[i];
 			}
 		}
 		return s;
@@ -2002,37 +2008,110 @@ void main()
 	//lucru cu fisiere binare pentru clasele Planeta, Stea si Galaxie
 	
     //fstream f("Astronomie.dat", ios::out | ios::binary);
+	//string* denumireTari = new string[4];
+	//denumireTari[0] = "Islanda";
+	//denumireTari[1] = "Elvetia";
+	//denumireTari[2] = "Turcia";
+	//denumireTari[3] = "Norvegia";
+	//Planeta planeta(1, "Pamant", 12742.0, 4, denumireTari);
+
+	//string* compozitie = new string[2];
+	//compozitie[0] = "Hidrogen";
+	//compozitie[1] = "Heliu";
+	//Stea stea(1, "Soare", 5778, 696340, 2, compozitie);
+
+	//string* denumireTipuriStele = new string[3];
+	//denumireTipuriStele[0] = "Nanosecvente";
+	//denumireTipuriStele[1] = "Nanogigante";
+	//denumireTipuriStele[2] = "Supernovele";
+	//Galaxie galaxie(1, "Andromeda", 3, denumireTipuriStele);
+
+	///*planeta.scrieInFisierBinar(f);
+	//stea.scrieInFisierBinar(f);
+	//galaxie.scrieInFisierBinar(f);
+	//f.close();*/
+
+	//fstream g("Astronomie.dat", ios::in | ios::binary);
+	//planeta.citesteDinFisierBinar(g);
+	//cout << green << planeta;
+ //   stea.cietsteDinFisierBinar(g);
+	//cout << red << stea;
+	//galaxie.citesteDinFisierBinar(g);
+	//cout << blue << galaxie << intensity;
+	//g.close();
+
+    //faza 7 
+    SmartPlanet sp1;
+	cout << sp1 << endl;
+
 	string* denumireTari = new string[4];
 	denumireTari[0] = "Islanda";
 	denumireTari[1] = "Elvetia";
 	denumireTari[2] = "Turcia";
 	denumireTari[3] = "Norvegia";
-	Planeta planeta(1, "Pamant", 12742.0, 4, denumireTari);
+	SmartPlanet sp2(20, "Smart", "Pamant", 12742.0, 4, denumireTari);
+	cout << sp2 << endl;
 
-	string* compozitie = new string[2];
-	compozitie[0] = "Hidrogen";
-	compozitie[1] = "Heliu";
-	Stea stea(1, "Soare", 5778, 696340, 2, compozitie);
+	SmartPlanet sp3(18, "New");
+	cout << sp3 << endl;
+
+	SmartPlanet sp4;
+	//cin >> sp4;
+	//cout << endl << sp4 << endl;
+
+	SmartPlanet sp5(sp1);
+	cout << sp5 << endl;
+
+	sp5 = sp3;
+	cout << sp5 <<endl;
+
+	SmartPlanet sp6;
+	sp6.setVarstaTehnologie(9);
+	sp6.getVarstaTehnologie();
+	sp6.setDenumireTehnologie("Innovation");
+	sp6.getDenumireTehnologie();
+	cout << sp6 << endl;
+
+	cout << "Peste 5 ani, aceasta tehnologie va avea varsta de: " << sp6.InvechireaTehnologiei(5) << endl;
+
+	//upcasting
+	Planeta* planeta = &sp2;
+	cout << endl << *planeta << endl;
+
+    GalaxieStralucitoare gs1;
+	cout << gs1;
 
 	string* denumireTipuriStele = new string[3];
 	denumireTipuriStele[0] = "Nanosecvente";
 	denumireTipuriStele[1] = "Nanogigante";
 	denumireTipuriStele[2] = "Supernovele";
-	Galaxie galaxie(1, "Andromeda", 3, denumireTipuriStele);
+	int* nasteriStelePeAn = new int[3] {23, 17, 36};
+	GalaxieStralucitoare gs2(736634.78, 3, nasteriStelePeAn, "Andromeda", 3, denumireTipuriStele);
+	cout << gs2;
 
-	/*planeta.scrieInFisierBinar(f);
-	stea.scrieInFisierBinar(f);
-	galaxie.scrieInFisierBinar(f);
-	f.close();*/
+	GalaxieStralucitoare gs3(4726482.89);
+	cout << gs3;
+	
+	GalaxieStralucitoare gs4;
+	//cin >> gs4;
+	//cout << endl << gs4;
 
-	fstream g("Astronomie.dat", ios::in | ios::binary);
-	planeta.citesteDinFisierBinar(g);
-	cout << green << planeta;
-    stea.cietsteDinFisierBinar(g);
-	cout << red << stea;
-	galaxie.citesteDinFisierBinar(g);
-	cout << blue << galaxie << intensity;
-	g.close();
+	GalaxieStralucitoare gs5(gs1);
+	cout << gs5;
 
+	gs5 = gs5;
 
-  }
+	gs5.setStralucire(56767.7);
+	gs5.getStralucire();
+    int* nasteri = new int[4] {56, 34, 23, 45};
+	gs5.setNumarStele(4, nasteri);
+	gs5.getNasteri();
+	cout << gs5;
+
+	cout << "In ceea ce priveste aceasta galaxie, in total vor aparea: " << gs5.calculeazaNasteriInToatal() << " stele." << endl;
+
+	//upcasting
+	Galaxie* galaxie= &gs2;
+	cout << endl << *galaxie;
+	
+	}
