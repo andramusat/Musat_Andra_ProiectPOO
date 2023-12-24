@@ -8,7 +8,43 @@ using namespace std;
 
 //DOMENIUL ASTRONOMIE
 
-class Planeta 
+class CorpCeresc
+{
+private:
+	string nume;
+public:
+	CorpCeresc()
+	{
+		this->nume = "NoName";
+	}
+
+	virtual ~CorpCeresc()
+	{
+
+	}
+	
+	string getNume()
+	{
+		return this->nume;
+	}
+
+	void setNume(string nume)
+	{
+		if (this->nume.length() > 3)
+		{
+			this -> nume = nume;
+		}
+	}
+
+	virtual void prezentareCorpCeresc() = 0;
+};
+
+void prezentare(CorpCeresc* cp)
+{
+	cp->prezentareCorpCeresc();
+}
+
+class Planeta : public CorpCeresc
 {
 private:
 	const int id;
@@ -19,7 +55,12 @@ private:
     string* denumireTari;
 public:
 
-	Planeta():id(1) 
+	void prezentareCorpCeresc()
+	{
+		cout << "Planeta " << this->nume << " cu id-ul " << this->id << " are diametrul de " << this->diametru << " km." << endl;
+    }
+
+	Planeta(): CorpCeresc(), id(1) 
 	{
 		this->nume = "NoName";
 		this->diametru = 0;
@@ -27,7 +68,7 @@ public:
 		this->denumireTari = NULL;
     }
 	
-    Planeta(int id, string nume, float diametru, int numarTari, string* denumireTari) : id(id), nume(nume), diametru(diametru), numarTari(numarTari)
+    Planeta(int id, string nume, float diametru, int numarTari, string* denumireTari) : CorpCeresc(), id(id), nume(nume), diametru(diametru), numarTari(numarTari)
 	{
 		if (numarTari != 0)
 		{
@@ -43,7 +84,7 @@ public:
 		}
 	}
 	
-	Planeta(int id, string nume, float diametru) :id(id)
+	Planeta(int id, string nume, float diametru) : CorpCeresc(), id(id)
 	{
 		this->nume = nume;
 		this->diametru = diametru;
@@ -51,7 +92,7 @@ public:
 		this->denumireTari = NULL;
 	}
 
-	Planeta(const Planeta& planeta) : id(planeta.id)
+	Planeta(const Planeta& planeta) : CorpCeresc(planeta), id(planeta.id)
 	{
 		this->nume = planeta.nume;
 		this->diametru = planeta.diametru;
@@ -74,6 +115,7 @@ public:
 	{
 		if (this != &planeta)
 		{
+			CorpCeresc::operator=(planeta);
 			this->nume = planeta.nume;
 			this->diametru = planeta.diametru;
 			this->numarTari = planeta.numarTari;
@@ -97,7 +139,7 @@ public:
 		return *this;
 	}
 
-	~Planeta() 
+	virtual ~Planeta() 
 	{
 		if (this->denumireTari != NULL)
 		{
@@ -420,6 +462,11 @@ private:
 	char* denumireTehnologie;
 public:
 
+	void prezentareCorpCeresc()
+	{
+		cout << "Aceasta este Smart Planet ce are o tehnologie de " << this->varstaTehnologie << " ani si se numeste " << this->denumireTehnologie << "." << endl;
+	}
+
 	SmartPlanet() : Planeta()
 	{
 		this->varstaTehnologie = 0;
@@ -538,7 +585,12 @@ public:
 
 };
 
-class Stea
+void prezentare(SmartPlanet sp)
+{
+	sp.prezentareCorpCeresc();
+}
+
+class Stea : public CorpCeresc
 {
 private:
 	const int id;
@@ -550,7 +602,12 @@ private:
 	string* compozitie; 
 public:
 
-	Stea() : id(1)
+	void prezentareCorpCeresc()
+	{
+		cout << "Steaua " << this->nume << " cu id-ul " << this->id << " are temperatura de " << this->temperatura << " Kelvin." << endl;
+	}
+
+	Stea() : CorpCeresc(), id(1)
 	{
 		this->nume = "NoName";
 		this->temperatura = 0.0;
@@ -558,7 +615,7 @@ public:
 		this->compozitie = NULL;
 	}
 
-	Stea(int id, string nume, float temperatura, float raza, int numarElemente, string* compozitie): id(id), nume(nume), temperatura(temperatura), raza(raza), numarElemente(numarElemente)
+	Stea(int id, string nume, float temperatura, float raza, int numarElemente, string* compozitie): CorpCeresc(), id(id), nume(nume), temperatura(temperatura), raza(raza), numarElemente(numarElemente)
 	{
 		if (numarElemente != 0)
 		{
@@ -574,7 +631,7 @@ public:
 		}
 	}
 
-	Stea(int id, string nume, float temperatura) :id(id)
+	Stea(int id, string nume, float temperatura) : CorpCeresc(), id(id)
 	{
 		this->nume = nume;
 		this->temperatura = temperatura;
@@ -583,7 +640,7 @@ public:
 		this->compozitie = NULL;
 	}
 
-	Stea(const Stea& stea) : id(stea.id)
+	Stea(const Stea& stea) : CorpCeresc(stea), id(stea.id)
 	{
 		this->nume = stea.nume;
 		this->temperatura = stea.temperatura;
@@ -607,6 +664,7 @@ public:
 	{
 		if (this != &stea)
 		{
+			CorpCeresc::operator=(stea);
 			this->nume = stea.nume;
 			this->temperatura = stea.temperatura;
 			this->raza = stea.raza;
@@ -631,7 +689,7 @@ public:
 		return *this;
 	}
 
-	~Stea()
+	virtual ~Stea()
 	{
 		if (this->compozitie != NULL)
 		{
@@ -1142,7 +1200,84 @@ ostream& operator<<(ostream& vizualizare, const Constelatie& constelatie)
 	return vizualizare;
 }
 
-class Galaxie
+//clasa cu relatie "has a", acum pentru faza 8
+class Constelatie2
+{
+private:
+	int numarCorpuriCeresti;
+	CorpCeresc** corpuriCeresti;
+public:
+	Constelatie2()
+	{
+		this->numarCorpuriCeresti = 10;
+		this->corpuriCeresti = new CorpCeresc * [10];
+		for (int i = 0;i < 10;i++)
+		{
+			this->corpuriCeresti[i] = new Planeta();
+		}
+	}
+
+	~Constelatie2()
+	{
+		for (int i = 0;i < 10;i++)
+		{
+			for (int i = 0; i < 10; i++) {
+				delete this->corpuriCeresti[i];
+			}
+		}
+		delete[]corpuriCeresti;
+	}
+
+	CorpCeresc*& operator[](int index)
+	{
+		if (index >= 0 && index < this->numarCorpuriCeresti)
+		{
+			return this->corpuriCeresti[index];
+		}
+		else 
+		{
+			throw 404;
+		}
+	}
+};
+
+class Galaxy
+{
+private:
+	string nume;
+public:
+	virtual void prezentareGalaxy() = 0;
+
+	Galaxy()
+	{
+		this->nume = "NoName";
+	}
+
+	virtual ~Galaxy()
+	{
+
+	}
+	
+	string getNume()
+	{
+		return this->nume;
+	}
+
+	void setNume(string nume)
+	{
+		if (this->nume.length() > 3)
+		{
+			this->nume = nume;
+		}
+	}
+};
+
+void prezenatare(Galaxy* gs)
+{
+	gs->prezentareGalaxy();
+}
+
+class Galaxie : public Galaxy
 {
 private:
 	const int id;
@@ -1152,14 +1287,19 @@ private:
 	string* denumireTipuriStele;
 public:
 
-	Galaxie() : id(1)
+	void prezentareGalaxy()
+	{
+		cout << "Galaxia cu id-ul " << this->id << " are denumirea " << this->nume << "." << endl;
+	}
+
+	Galaxie() : Galaxy(), id(1)
 	{
 		this->nume = "NoName";
 		this->numarTipuriStele = 0;
 		this->denumireTipuriStele = NULL;
 	}
 
-	Galaxie(int id, string nume, int numarTipuriStele, string* denumireTipuriStele): id(id), nume(nume), numarTipuriStele(numarTipuriStele)
+	Galaxie(int id, string nume, int numarTipuriStele, string* denumireTipuriStele): Galaxy(), id(id), nume(nume), numarTipuriStele(numarTipuriStele)
 	{
 		if (numarTipuriStele != 0)
 		{
@@ -1175,14 +1315,14 @@ public:
 		}
 	}
 
-	Galaxie(int id, string nume) :id(id)
+	Galaxie(int id, string nume) : Galaxy(), id(id)
 	{
 		this->nume = nume;
 		this->numarTipuriStele = 0;
 		this->denumireTipuriStele = NULL;
 	}
 
-	Galaxie(const Galaxie& galaxie) : id(galaxie.id)
+	Galaxie(const Galaxie& galaxie) : Galaxy(galaxie), id(galaxie.id)
 	{
 		this->nume = galaxie.nume;
 		this->numarTipuriStele = galaxie.numarTipuriStele;
@@ -1204,6 +1344,7 @@ public:
 	{
 		if (this != &galaxie)
 		{
+			Galaxy::operator=(galaxie);
 			this->nume = galaxie.nume;
 			this->numarTipuriStele = galaxie.numarTipuriStele;
 			if (this->denumireTipuriStele != NULL)
@@ -1226,7 +1367,7 @@ public:
 		return *this;
 	}
 
-	~Galaxie()
+	virtual ~Galaxie()
 	{
 		if (this->denumireTipuriStele != NULL)
 		{
@@ -1395,9 +1536,6 @@ public:
 		}
 		return in;
 	}
-	/*string nume;
-	int numarTipuriStele;
-	string* denumireTipuriStele;*/
 
 	void scrieInFisierBinar(fstream& f) 
 	{
@@ -1445,7 +1583,7 @@ int Galaxie::numarGalaxii = 0;
 long getMasaTotala(const Galaxie& galaxie)
 {
 	//masa totala a galaxiei
-	return galaxie.numarTipuriStele * 2e30; // Presupunem o masa medie a unei stele de 2e30 kg
+	return galaxie.numarTipuriStele * 2e30; // Presupunem o masa medie a unui tip de stele de 2e30 kg
 }
 
 string getSirTipuriStele(const Galaxie& galaxie)
@@ -1501,6 +1639,11 @@ private:
 	int nrAni;
 	int* nasteriStelePeAn;
 public:
+
+	void prezentareGalaxy()
+	{
+		cout << "Aceasta galaxie are o stralucire de " << this->stralucire << " unitati solare." << endl;
+	}
 
 	GalaxieStralucitoare() :Galaxie()
 	{
@@ -1699,6 +1842,11 @@ public:
 	}
 
 };
+
+void prezentare(GalaxieStralucitoare gs)
+{
+	gs.prezentareGalaxy();
+}
 
 void main()
 {
@@ -2041,77 +2189,144 @@ void main()
 	//g.close();
 
     //faza 7 
-    SmartPlanet sp1;
-	cout << sp1 << endl;
+ //   SmartPlanet sp1;
+	//cout << sp1 << endl;
 
-	string* denumireTari = new string[4];
-	denumireTari[0] = "Islanda";
-	denumireTari[1] = "Elvetia";
-	denumireTari[2] = "Turcia";
-	denumireTari[3] = "Norvegia";
-	SmartPlanet sp2(20, "Smart", "Pamant", 12742.0, 4, denumireTari);
-	cout << sp2 << endl;
+	//string* denumireTari = new string[4];
+	//denumireTari[0] = "Islanda";
+	//denumireTari[1] = "Elvetia";
+	//denumireTari[2] = "Turcia";
+	//denumireTari[3] = "Norvegia";
+	//SmartPlanet sp2(20, "Smart", "Pamant", 12742.0, 4, denumireTari);
+	//cout << sp2 << endl;
 
-	SmartPlanet sp3(18, "New");
-	cout << sp3 << endl;
+	//SmartPlanet sp3(18, "New");
+	//cout << sp3 << endl;
 
-	SmartPlanet sp4;
-	//cin >> sp4;
-	//cout << endl << sp4 << endl;
+	//SmartPlanet sp4;
+	////cin >> sp4;
+	////cout << endl << sp4 << endl;
 
-	SmartPlanet sp5(sp1);
-	cout << sp5 << endl;
+	//SmartPlanet sp5(sp1);
+	//cout << sp5 << endl;
 
-	sp5 = sp3;
-	cout << sp5 <<endl;
+	//sp5 = sp3;
+	//cout << sp5 <<endl;
 
-	SmartPlanet sp6;
-	sp6.setVarstaTehnologie(9);
-	sp6.getVarstaTehnologie();
-	sp6.setDenumireTehnologie("Innovation");
-	sp6.getDenumireTehnologie();
-	cout << sp6 << endl;
+	//SmartPlanet sp6;
+	//sp6.setVarstaTehnologie(9);
+	//sp6.getVarstaTehnologie();
+	//sp6.setDenumireTehnologie("Innovation");
+	//sp6.getDenumireTehnologie();
+	//cout << sp6 << endl;
 
-	cout << "Peste 5 ani, aceasta tehnologie va avea varsta de: " << sp6.InvechireaTehnologiei(5) << endl;
+	//cout << "Peste 5 ani, aceasta tehnologie va avea varsta de: " << sp6.InvechireaTehnologiei(5) << endl;
 
-	//upcasting
-	Planeta* planeta = &sp2;
-	cout << endl << *planeta << endl;
+	////upcasting
+	//Planeta* planeta = &sp2;
+	//cout << endl << *planeta << endl;
 
-    GalaxieStralucitoare gs1;
-	cout << gs1;
+ //   GalaxieStralucitoare gs1;
+	//cout << gs1;
 
-	string* denumireTipuriStele = new string[3];
-	denumireTipuriStele[0] = "Nanosecvente";
-	denumireTipuriStele[1] = "Nanogigante";
-	denumireTipuriStele[2] = "Supernovele";
-	int* nasteriStelePeAn = new int[3] {23, 17, 36};
-	GalaxieStralucitoare gs2(736634.78, 3, nasteriStelePeAn, "Andromeda", 3, denumireTipuriStele);
-	cout << gs2;
+	//string* denumireTipuriStele = new string[3];
+	//denumireTipuriStele[0] = "Nanosecvente";
+	//denumireTipuriStele[1] = "Nanogigante";
+	//denumireTipuriStele[2] = "Supernovele";
+	//int* nasteriStelePeAn = new int[3] {23, 17, 36};
+	//GalaxieStralucitoare gs2(736634.78, 3, nasteriStelePeAn, "Andromeda", 3, denumireTipuriStele);
+	//cout << gs2;
 
-	GalaxieStralucitoare gs3(4726482.89);
-	cout << gs3;
+	//GalaxieStralucitoare gs3(4726482.89);
+	//cout << gs3;
+	//
+	//GalaxieStralucitoare gs4;
+	////cin >> gs4;
+	////cout << endl << gs4;
+
+	//GalaxieStralucitoare gs5(gs1);
+	//cout << gs5;
+
+	//gs5 = gs5;
+
+	//gs5.setStralucire(56767.7);
+	//gs5.getStralucire();
+ //   int* nasteri = new int[4] {56, 34, 23, 45};
+	//gs5.setNumarStele(4, nasteri);
+	//gs5.getNasteri();
+	//cout << gs5;
+
+	//cout << "In ceea ce priveste aceasta galaxie, in total vor aparea: " << gs5.calculeazaNasteriInToatal() << " stele." << endl;
+
+	////upcasting
+	//Galaxie* galaxie= &gs2;
+	//cout << endl << *galaxie;
 	
-	GalaxieStralucitoare gs4;
-	//cin >> gs4;
-	//cout << endl << gs4;
 
-	GalaxieStralucitoare gs5(gs1);
-	cout << gs5;
+    //faza 8
 
-	gs5 = gs5;
+    Galaxy* gs = new Galaxie();
+	gs->setNume("Galaxy");
+	cout << gs->getNume() << " contine: " << endl;
+	delete gs;
 
-	gs5.setStralucire(56767.7);
-	gs5.getStralucire();
-    int* nasteri = new int[4] {56, 34, 23, 45};
-	gs5.setNumarStele(4, nasteri);
-	gs5.getNasteri();
-	cout << gs5;
+    Galaxy** galaxii;
+	galaxii = new Galaxy * [10];
+	galaxii[0] = new Galaxie(1, "Medusa");
+	galaxii[1] = new GalaxieStralucitoare(5654.8);
+	galaxii[2] = new Galaxie(2, "Sculptorul");
+	galaxii[3] = new GalaxieStralucitoare(4567.9);
+	galaxii[4] = new Galaxie(3, "Andromeda");
+	galaxii[5] = new GalaxieStralucitoare(6789.9);
+	galaxii[6] = new Galaxie(4, "Calea Lactee");
+	galaxii[7] = new GalaxieStralucitoare(7543.8);
+	galaxii[8] = new Galaxie(5, "Pitica");
+	galaxii[9] = new GalaxieStralucitoare(57424.6);
 
-	cout << "In ceea ce priveste aceasta galaxie, in total vor aparea: " << gs5.calculeazaNasteriInToatal() << " stele." << endl;
+	for (int i = 0;i < 10;i++)
+	{
+		galaxii[i]->prezentareGalaxy();
+	}
+  
+	delete galaxii;
 
-	//upcasting
-	Galaxie* galaxie= &gs2;
-	cout << endl << *galaxie;
+	cout << endl << "Constelatia pe care va o prezint contine urmatoarele corpuri ceresti: " << endl;
+
+    Constelatie2 constelatie;
+	constelatie[0] = new Planeta(1, "Mercur", 4879.4);
+	constelatie[1] = new SmartPlanet(14, "Innovation");
+	constelatie[2] = new Stea(1, "Altair", 2600);
+	constelatie[3] = new Planeta(2,"Venus", 12104);
+	constelatie[4] = new SmartPlanet(6, "New");
+	constelatie[5] = new Stea(2, "Antares", 3570);
+	constelatie[6] = new Planeta(3, "Jupiter", 139820);
+	constelatie[7] = new SmartPlanet(17, "Smart");
+	constelatie[8] = new Stea(3, "Sirius", 9940);
+	constelatie[9] = new Planeta(4, "Saturn", 116460);
+
+	for (int i = 0;i < 10;i++)
+	{
+		constelatie[i]->prezentareCorpCeresc();
+	}
+
+    try
+	{
+		cout << "Al treilea element din constelatie: ";
+		constelatie[2]->prezentareCorpCeresc();
+	}
+	catch (int ex1) {
+		cout << "Pozitia este in afara limitelor" << endl;
+	}
+	catch (float ex2) {
+		cout << "Pozitia este in afara limitelor" << endl;
+	}
+	catch (...) {
+		cout << "Exceptie necunoscuta";
+	}
+
+	for (int i = 0; i < 10;i++)
+	{
+		delete constelatie[i];
+	}
 	
 	}
