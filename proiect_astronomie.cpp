@@ -8,6 +8,27 @@ using namespace std;
 
 //DOMENIUL ASTRONOMIE
 
+ostream& red(ostream& out)
+{
+	HANDLE standardOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(standardOutput, FOREGROUND_RED);
+	return out;
+}
+
+ostream& intensity(ostream& out)
+{
+	HANDLE standardOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(standardOutput, FOREGROUND_INTENSITY);
+	return out;
+}
+
+ostream& green(ostream& out)
+{
+	HANDLE standardOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(standardOutput, FOREGROUND_GREEN);
+	return out;
+}
+
 class CorpCeresc
 {
 private:
@@ -55,9 +76,10 @@ private:
     string* denumireTari;
 public:
 
-	void prezentareCorpCeresc()
+	void prezentareCorpCeresc() 
 	{
-		cout << "Planeta " << this->nume << " cu id-ul " << this->id << " are diametrul de " << this->diametru << " km." << endl;
+		cout << green <<"Planeta " << this->nume << " cu id-ul " << this->id << " are diametrul de " << this->diametru << " km." << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
     }
 
 	Planeta(): CorpCeresc(), id(1) 
@@ -405,6 +427,9 @@ public:
 			delete[] bufferDenumireTari;
 		}
 	}
+
+	friend ostream& green(ostream& out);
+
 };
 
 int Planeta::numarPlanete = 9;
@@ -448,12 +473,6 @@ ostream& operator<<(ostream& vizualizare, const Planeta& planeta)
 	return vizualizare;
 }
 
-ostream& green(ostream& out)
-{
-	HANDLE standardOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(standardOutput, FOREGROUND_GREEN);
-	return out;
-}
 
 class SmartPlanet: public Planeta
 {
@@ -464,7 +483,8 @@ public:
 
 	void prezentareCorpCeresc()
 	{
-		cout << "Aceasta este Smart Planet ce are o tehnologie de " << this->varstaTehnologie << " ani si se numeste " << this->denumireTehnologie << "." << endl;
+		cout << intensity <<"Aceasta este Smart Planet ce are o tehnologie de " << this->varstaTehnologie << " ani si se numeste " << this->denumireTehnologie << "." << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	}
 
 	SmartPlanet() : Planeta()
@@ -583,6 +603,8 @@ public:
 		return in;
 	}
 
+	friend ostream& intensity(ostream& out);
+
 };
 
 void prezentare(SmartPlanet sp)
@@ -604,7 +626,8 @@ public:
 
 	void prezentareCorpCeresc()
 	{
-		cout << "Steaua " << this->nume << " cu id-ul " << this->id << " are temperatura de " << this->temperatura << " Kelvin." << endl;
+		cout << red << "Steaua " << this->nume << " cu id-ul " << this->id << " are temperatura de " << this->temperatura << " Kelvin." << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	}
 
 	Stea() : CorpCeresc(), id(1)
@@ -944,6 +967,8 @@ public:
 		}
 	}
 
+	friend ostream& red(ostream& out);
+
 };
 
 int Stea::numarStele = 0;
@@ -983,13 +1008,6 @@ ostream& operator<<(ostream& vizualizare, const Stea& stea)
 	}
 	vizualizare << endl;
 	return vizualizare;
-}
-
-ostream& red(ostream& out)
-{
-	HANDLE standardOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(standardOutput, FOREGROUND_RED);
-	return out;
 }
 
 //relatie de "has a" cu clasa stea
@@ -1241,6 +1259,13 @@ public:
 	}
 };
 
+ostream& blue(ostream& out)
+{
+	HANDLE standardOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(standardOutput, FOREGROUND_BLUE);
+	return out;
+}
+
 class Galaxy
 {
 private:
@@ -1289,7 +1314,8 @@ public:
 
 	void prezentareGalaxy()
 	{
-		cout << "Galaxia cu id-ul " << this->id << " are denumirea " << this->nume << "." << endl;
+		cout<< blue << "Galaxia cu id-ul " << this->id << " are denumirea " << this->nume << "." << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	}
 
 	Galaxie() : Galaxy(), id(1)
@@ -1576,6 +1602,8 @@ public:
 		}
 	}
 
+	friend ostream& blue(ostream& out);
+
 };
 
 int Galaxie::numarGalaxii = 0;
@@ -1618,20 +1646,6 @@ ostream& operator<<(ostream& vizualizare, const Galaxie& galaxie)
 	return vizualizare;
 }
 
-ostream& blue(ostream& out)
-{
-	HANDLE standardOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(standardOutput, FOREGROUND_BLUE);
-	return out;
-}
-
-ostream& intensity(ostream& out)
-{
-	HANDLE standardOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(standardOutput, FOREGROUND_INTENSITY);
-	return out;
-}
-
 class GalaxieStralucitoare : public Galaxie
 {
 private:
@@ -1642,7 +1656,8 @@ public:
 
 	void prezentareGalaxy()
 	{
-		cout << "Aceasta galaxie are o stralucire de " << this->stralucire << " unitati solare." << endl;
+		cout<< intensity << "Aceasta galaxie are o stralucire de " << this->stralucire << " unitati solare." << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	}
 
 	GalaxieStralucitoare() :Galaxie()
@@ -1841,12 +1856,15 @@ public:
 		return s;
 	}
 
+	friend ostream& intensity(ostream& out);
+
 };
 
 void prezentare(GalaxieStralucitoare gs)
 {
 	gs.prezentareGalaxy();
 }
+
 
 void main()
 {
@@ -2265,9 +2283,13 @@ void main()
 
     //faza 8
 
+    cout << "Eterea Stellara este o vasta expansiune cosmica, indeajuns de complexa si fascinanta pentru a incanta \nimaginatia oricarui observator interstelar." << endl;
+    cout<<"Acest univers este plin de mistere, cu galaxii si constelatii care stralucesc in noaptea cosmica." << endl;
+	cout << "Intr-un colt indepartat al Eterei Stellara, se gasesc galaxiile Eterei Serenitati, o adunatura de \ngalaxii spirale cu brate luminoase care se intind pe intregul lor diametru." << endl;
+
     Galaxy* gs = new Galaxie();
-	gs->setNume("Galaxy");
-	cout << gs->getNume() << " contine: " << endl;
+	gs->setNume("Galaxiile");
+	cout << gs->getNume() << " sunt: " << endl;
 	delete gs;
 
     Galaxy** galaxii;
@@ -2288,9 +2310,16 @@ void main()
 		galaxii[i]->prezentareGalaxy();
 	}
   
-	delete galaxii;
+	for (int i = 0;i < 10;i++)
+	{
+		delete galaxii[i];
+	}
+	delete[]galaxii;
 
-	cout << endl << "Constelatia pe care va o prezint contine urmatoarele corpuri ceresti: " << endl;
+	cout << endl <<"In mijlocul acestei bogatii stelare, constelatia Diamantul Astral straluceste ca o bijuterie divina." << endl;
+	cout << "Aceasta constelatie adaposteste o serie de corpuri ceresti unice, precum stele supergigante pulsare \nsi nebuloase stralucitoare, care ii confera o frumusete aparte." << endl;
+	cout << "Totodata se remarca planete fascinante, astfel constelatia oferind in cele din urma locuinta pentru \nviata cosmica si peisaje ceresti uluitoare.";
+	cout<< endl << "O parte din aceste corpuri ceresti sunt: " << endl;
 
     Constelatie2 constelatie;
 	constelatie[0] = new Planeta(1, "Mercur", 4879.4);
@@ -2328,5 +2357,6 @@ void main()
 	{
 		delete constelatie[i];
 	}
-	
-	}
+
+	cout << endl << "Exploratorii interstelari si calatoriile spatiale se aduna in Eterea Stellara pentru a descoperi \nsecretele ascunse ale constelatiilor si galaxiilor, pentru a contempla stelele luminoase si pentru \na cauta noi forme de viata si civilizatii printre stelele indepartate ale acestui univers captivant." << endl;
+}
